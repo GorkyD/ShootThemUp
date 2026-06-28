@@ -1,13 +1,14 @@
 // Gorky Deathmatch Game, All Rights Reserved.
 
 #include "Player/STUBaseCharacter.h"
-
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "STUCharacterMovementComponent.h"
+#include "Engine/DamageEvents.h"
 
-ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer)
-	: Super(ObjectInitializer.SetDefaultSubobjectClass<USTUCharacterMovementComponent>(CharacterMovementComponentName))
+DEFINE_LOG_CATEGORY_STATIC(LogBaseCharacter, All, All)
+
+ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<USTUCharacterMovementComponent>(CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -17,11 +18,24 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer &ObjectInitializer
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
+
+	HealthComponent = CreateDefaultSubobject<USTUHealthComponent>("HealthComponent");
+	HealthComponent->OnDeath.AddUObject(this, &ASTUBaseCharacter::OnDeath);
+	HealthComponent->OnHealthChanged.AddUObject(this, &ASTUBaseCharacter::OnHealthChanged);
+
+	HealthTextComponent = CreateDefaultSubobject<UTextRenderComponent>("HealthTextComponent");
+	HealthTextComponent->SetupAttachment(GetRootComponent());
 }
 
 void ASTUBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	check(HealthComponent);
+	check(HealthTextComponent);
+	check(GetCharacterMovement());
+
+	LandedDelegate.AddDynamic(this, &ASTUBaseCharacter::OnGroundLanded);
 }
 
 void ASTUBaseCharacter::Tick(float DeltaTime)
@@ -29,9 +43,10 @@ void ASTUBaseCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
+void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	check(PlayerInputComponent);
 
 	PlayerInputComponent->BindAxis("MoveHorizontal", this, &ASTUBaseCharacter::MoveHorizontal);
 	PlayerInputComponent->BindAxis("MoveVertical", this, &ASTUBaseCharacter::MoveVertical);
@@ -49,7 +64,8 @@ bool ASTUBaseCharacter::IsRunning() const
 }
 float ASTUBaseCharacter::GetMovementDirection() const
 {
-	if (GetVelocity().IsZero()) return 0.0f;
+	if (GetVelocity().IsZero())
+		return 0.0f;
 	const auto VelocityNormal = GetVelocity().GetSafeNormal();
 	const auto AngleBetween = FMath::Acos(FVector::DotProduct(GetActorForwardVector(), VelocityNormal));
 	const auto CrossProduct = FVector::CrossProduct(GetActorForwardVector(), VelocityNormal);
@@ -58,12 +74,14 @@ float ASTUBaseCharacter::GetMovementDirection() const
 }
 void ASTUBaseCharacter::MoveHorizontal(float amount)
 {
-	if (amount == 0.0f) return;
+	if (amount == 0.0f)
+		return;
 	AddMovementInput(GetActorRightVector(), amount);
 }
 void ASTUBaseCharacter::MoveVertical(float amount)
 {
-	if (amount == 0.0f) return;
+	if (amount == 0.0f)
+		return;
 	IsMovingForward = amount > 0.0f;
 	AddMovementInput(GetActorForwardVector(), amount);
 }
@@ -75,4 +93,30 @@ void ASTUBaseCharacter::OnStartRunning()
 void ASTUBaseCharacter::OnStopRunning()
 {
 	WantsToRun = false;
+}
+void ASTUBaseCharacter::OnHealthChanged(float Health) const
+{
+	HealthTextComponent->SetText(FText::FromString(FString::Printf(TEXT("%.0f"), Health)));
+}
+
+void ASTUBaseCharacter::OnDeath()
+{
+	UE_LOG(LogBaseCharacter, Display, TEXT("Player %s Is Dead"), *GetName());
+
+	PlayAnimMontage(DeathMontage);
+	GetCharacterMovement()->DisableMovement();
+	SetLifeSpan(LifeSpanOnDeath);
+
+	if (Controller)
+	{
+		Controller->ChangeState(NAME_Spectating);
+	}
+}
+void ASTUBaseCharacter::OnGroundLanded(const FHitResult& Hit)
+{
+	const auto FallVelocityZ = -GetVelocity().Z;
+	if (FallVelocityZ < LandedDamageVelocity.X)
+		return;
+	const auto FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, FallVelocityZ);
+	TakeDamage(FinalDamage, FDamageEvent{}, nullptr, nullptr);
 }

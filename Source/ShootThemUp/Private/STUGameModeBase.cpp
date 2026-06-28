@@ -1,7 +1,6 @@
 // Gorky Deathmatch Game, All Rights Reserved.
 
 #include "STUGameModeBase.h"
-
 #include "STUBaseCharacter.h"
 #include "STUPlayerController.h"
 
