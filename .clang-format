@@ -2,3 +2,6 @@ Language: Cpp
 BasedOnStyle: Microsoft
 UseTab: Always
 BreakBeforeBraces: Allman
+SortIncludes: Never
+PointerAlignment: Left
+ColumnLimit: 300
