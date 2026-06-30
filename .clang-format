@@ -5,3 +5,4 @@ BreakBeforeBraces: Allman
 SortIncludes: Never
 PointerAlignment: Left
 ColumnLimit: 300
+AllowShortIfStatementsOnASingleLine: WithoutElse

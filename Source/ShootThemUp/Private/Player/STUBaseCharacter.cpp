@@ -4,6 +4,7 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "STUCharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseCharacter, All, All)
@@ -15,6 +16,7 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer& ObjectInitializer
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
 	SpringArmComponent->bUsePawnControlRotation = true;
 	SpringArmComponent->SetupAttachment(GetRootComponent());
+	SpringArmComponent->SocketOffset = FVector(0.0f, 100.0f, 80.0f);
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
@@ -25,6 +27,9 @@ ASTUBaseCharacter::ASTUBaseCharacter(const FObjectInitializer& ObjectInitializer
 
 	HealthTextComponent = CreateDefaultSubobject<UTextRenderComponent>("HealthTextComponent");
 	HealthTextComponent->SetupAttachment(GetRootComponent());
+	HealthTextComponent->SetOwnerNoSee(true);
+
+	WeaponComponent = CreateDefaultSubobject<USTUWeaponComponent>("WeaponComponent");
 }
 
 void ASTUBaseCharacter::BeginPlay()
@@ -47,6 +52,7 @@ void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	check(PlayerInputComponent);
+	check(WeaponComponent);
 
 	PlayerInputComponent->BindAxis("MoveHorizontal", this, &ASTUBaseCharacter::MoveHorizontal);
 	PlayerInputComponent->BindAxis("MoveVertical", this, &ASTUBaseCharacter::MoveVertical);
@@ -57,31 +63,34 @@ void ASTUBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASTUBaseCharacter::Jump);
 	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &ASTUBaseCharacter::OnStartRunning);
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &ASTUBaseCharacter::OnStopRunning);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &USTUWeaponComponent::Fire);
 }
+
 bool ASTUBaseCharacter::IsRunning() const
 {
 	return WantsToRun && IsMovingForward && !GetVelocity().IsZero();
 }
+
 float ASTUBaseCharacter::GetMovementDirection() const
 {
-	if (GetVelocity().IsZero())
-		return 0.0f;
+	if (GetVelocity().IsZero()) return 0.0f;
 	const auto VelocityNormal = GetVelocity().GetSafeNormal();
 	const auto AngleBetween = FMath::Acos(FVector::DotProduct(GetActorForwardVector(), VelocityNormal));
 	const auto CrossProduct = FVector::CrossProduct(GetActorForwardVector(), VelocityNormal);
 	const auto Degrees = FMath::RadiansToDegrees(AngleBetween);
 	return CrossProduct.IsZero() ? Degrees : Degrees * FMath::Sign(CrossProduct.Z);
 }
+
 void ASTUBaseCharacter::MoveHorizontal(float amount)
 {
-	if (amount == 0.0f)
-		return;
+	if (amount == 0.0f) return;
 	AddMovementInput(GetActorRightVector(), amount);
 }
+
 void ASTUBaseCharacter::MoveVertical(float amount)
 {
-	if (amount == 0.0f)
-		return;
+	if (amount == 0.0f) return;
 	IsMovingForward = amount > 0.0f;
 	AddMovementInput(GetActorForwardVector(), amount);
 }
@@ -111,12 +120,14 @@ void ASTUBaseCharacter::OnDeath()
 	{
 		Controller->ChangeState(NAME_Spectating);
 	}
+
+	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
+
 void ASTUBaseCharacter::OnGroundLanded(const FHitResult& Hit)
 {
 	const auto FallVelocityZ = -GetVelocity().Z;
-	if (FallVelocityZ < LandedDamageVelocity.X)
-		return;
+	if (FallVelocityZ < LandedDamageVelocity.X) return;
 	const auto FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, FallVelocityZ);
 	TakeDamage(FinalDamage, FDamageEvent{}, nullptr, nullptr);
 }

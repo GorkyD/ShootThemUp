@@ -5,9 +5,11 @@
 #include "Camera/CameraComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "CoreMinimal.h"
+#include "STUBaseWeapon.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "STUHealthComponent.h"
+#include "STUWeaponComponent.h"
 #include "STUBaseCharacter.generated.h"
 
 class UCameraComponent;
@@ -34,6 +36,9 @@ class SHOOTTHEMUP_API ASTUBaseCharacter : public ACharacter
 	UTextRenderComponent* HealthTextComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	USTUWeaponComponent* WeaponComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement")
 	float SpintSpeed = 1000.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
