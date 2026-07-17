@@ -6,16 +6,14 @@
 #include "GameFramework/GameModeBase.h"
 #include "STUGameModeBase.generated.h"
 
-/**
- *
- */
 UCLASS()
-class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase {
-  GENERATED_BODY()
+class SHOOTTHEMUP_API ASTUGameModeBase : public AGameModeBase
+{
+	GENERATED_BODY()
 
-public:
+  public:
 	ASTUGameModeBase();
 
-protected:
-  void BeginPlay() override;
+  protected:
+	void BeginPlay() override;
 };

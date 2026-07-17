@@ -1,8 +1,6 @@
 // Gorky Deathmatch Game, All Rights Reserved.
 
-
 #include "Components/STUCharacterMovementComponent.h"
-
 #include "STUBaseCharacter.h"
 
 float USTUCharacterMovementComponent::GetMaxSpeed() const
