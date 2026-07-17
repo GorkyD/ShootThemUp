@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "STUCoreTypes.h"
 #include "GameFramework/Actor.h"
 #include "STUBaseWeapon.generated.h"
 
@@ -14,8 +15,13 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
   public:
 	ASTUBaseWeapon();
 
+	FOnClipEmptySignature OnClipEmpty;
+
 	virtual void StartFire();
 	virtual void StopFire();
+
+	void ChangeClip();
+	bool CanReload() const;
 
   protected:
 	virtual void BeginPlay() override;
@@ -23,10 +29,13 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	USkeletalMeshComponent* WeaponMeshComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+	FAmmoData DefaultAmmoData{15, 10, false};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
 	FName MuzzleSocketName = "MuzzleSocket";
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
 	float TraceMaxDistance = 1500.0f;
 
 	virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
@@ -35,7 +44,14 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 	APlayerController* GetPlayerController() const;
 	FVector GetMuzzleWorldLocation() const;
 
-	bool GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const;
-
 	void MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd);
+	void DecreaseAmmo();
+	void LogAmmo();
+
+	bool GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const;
+	bool IsAmmoEmpty() const;
+	bool IsClipEmpty() const;
+
+  private:
+	FAmmoData CurrentAmmoData;
 };

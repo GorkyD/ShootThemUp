@@ -18,6 +18,8 @@ void USTUHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	check(MaxHealth > 0);
+
 	SetHealth(MaxHealth);
 
 	AActor* ComponentOwner = GetOwner();
@@ -34,8 +36,7 @@ void USTUHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, co
 
 void USTUHealthComponent::TakeDamage(float Damage)
 {
-	if (Damage <= 0.0f || IsDead() || !GetWorld())
-		return;
+	if (Damage <= 0.0f || IsDead() || !GetWorld()) return;
 
 	SetHealth(Health - Damage);
 
@@ -87,4 +88,9 @@ float USTUHealthComponent::GetHealth() const
 bool USTUHealthComponent::IsDead() const
 {
 	return FMath::IsNearlyZero(Health);
+}
+
+float USTUHealthComponent::GetHealthPercent() const
+{
+	return Health / MaxHealth;
 }

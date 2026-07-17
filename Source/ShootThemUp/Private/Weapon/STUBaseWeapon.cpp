@@ -1,10 +1,8 @@
 // Gorky Deathmatch Game, All Rights Reserved.
 
 #include "Weapon/STUBaseWeapon.h"
-
 #include "DrawDebugHelpers.h"
 #include "TimerManager.h"
-#include "Engine/DamageEvents.h"
 #include "Engine/HitResult.h"
 #include "GameFramework/Character.h"
 
@@ -22,6 +20,9 @@ void ASTUBaseWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	check(WeaponMeshComponent);
+	checkf(DefaultAmmoData.Bullets > 0, TEXT("Bullets count couldn't be less than or equal to zero"));
+	checkf(DefaultAmmoData.Clips > 0, TEXT("Clips count couldn't be less than or equal to zero"));
+	CurrentAmmoData = DefaultAmmoData;
 }
 
 APlayerController* ASTUBaseWeapon::GetPlayerController() const
@@ -41,6 +42,16 @@ bool ASTUBaseWeapon::GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRot
 	return true;
 }
 
+bool ASTUBaseWeapon::IsAmmoEmpty() const
+{
+	return CurrentAmmoData.Clips == 0 && !CurrentAmmoData.Infinite && IsClipEmpty();
+}
+
+bool ASTUBaseWeapon::IsClipEmpty() const
+{
+	return CurrentAmmoData.Bullets == 0;
+}
+
 void ASTUBaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd)
 {
 	if (!GetWorld()) return;
@@ -49,6 +60,43 @@ void ASTUBaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, c
 	CollisionQueryParams.AddIgnoredActor(GetOwner());
 
 	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, CollisionQueryParams);
+}
+
+void ASTUBaseWeapon::DecreaseAmmo()
+{
+	if (CurrentAmmoData.Bullets == 0) return;
+
+	CurrentAmmoData.Bullets--;
+	LogAmmo();
+
+	if (IsClipEmpty() && !IsAmmoEmpty())
+	{
+		StopFire();
+		OnClipEmpty.Broadcast();
+	}
+}
+
+void ASTUBaseWeapon::ChangeClip()
+{
+	if (!CurrentAmmoData.Infinite)
+	{
+		if (CurrentAmmoData.Clips == 0) return;
+		CurrentAmmoData.Clips--;
+	}
+
+	CurrentAmmoData.Bullets = DefaultAmmoData.Bullets;
+	UE_LOG(LogBaseWeapon, Display, TEXT("----------Clip Changed----------"));
+}
+bool ASTUBaseWeapon::CanReload() const
+{
+	return CurrentAmmoData.Bullets < DefaultAmmoData.Bullets && CurrentAmmoData.Clips > 0;
+}
+
+void ASTUBaseWeapon::LogAmmo()
+{
+	FString LogAmmo = "Ammo: " + FString::FromInt(CurrentAmmoData.Bullets) + " / ";
+	LogAmmo += CurrentAmmoData.Infinite ? "Infinite" : FString::FromInt(CurrentAmmoData.Clips);
+	UE_LOG(LogBaseWeapon, Display, TEXT("%s"), *LogAmmo);
 }
 
 bool ASTUBaseWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
