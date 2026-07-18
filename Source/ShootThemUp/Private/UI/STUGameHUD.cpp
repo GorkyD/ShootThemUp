@@ -4,12 +4,19 @@
 
 #include "Engine/Canvas.h"
 
+void ASTUGameHUD::BeginPlay()
+{
+	Super::BeginPlay();
+	if (const auto PlayerHudWidget = CreateWidget<UUserWidget>(GetWorld(), PlayerHUDWidgetClass)) PlayerHudWidget->AddToViewport();
+}
+
 void ASTUGameHUD::DrawHUD()
 {
 	Super::DrawHUD();
 
-	DrawCrossHair();
+	// DrawCrossHair();
 }
+
 void ASTUGameHUD::DrawCrossHair()
 {
 	const TInterval Center(Canvas->SizeX * 0.5f, Canvas->SizeY * 0.5f);

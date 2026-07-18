@@ -20,6 +20,9 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 	virtual void StartFire();
 	virtual void StopFire();
 
+	FWeaponUIData GetWeaponUIData() const;
+	FAmmoData GetAmmoData() const;
+
 	void ChangeClip();
 	bool CanReload() const;
 
@@ -28,6 +31,9 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	USkeletalMeshComponent* WeaponMeshComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+	FWeaponUIData WeaponUIData;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
 	FAmmoData DefaultAmmoData{15, 10, false};
@@ -46,7 +52,6 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 
 	void MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd);
 	void DecreaseAmmo();
-	void LogAmmo();
 
 	bool GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const;
 	bool IsAmmoEmpty() const;

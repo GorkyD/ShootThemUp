@@ -67,7 +67,6 @@ void ASTUBaseWeapon::DecreaseAmmo()
 	if (CurrentAmmoData.Bullets == 0) return;
 
 	CurrentAmmoData.Bullets--;
-	LogAmmo();
 
 	if (IsClipEmpty() && !IsAmmoEmpty())
 	{
@@ -92,13 +91,6 @@ bool ASTUBaseWeapon::CanReload() const
 	return CurrentAmmoData.Bullets < DefaultAmmoData.Bullets && CurrentAmmoData.Clips > 0;
 }
 
-void ASTUBaseWeapon::LogAmmo()
-{
-	FString LogAmmo = "Ammo: " + FString::FromInt(CurrentAmmoData.Bullets) + " / ";
-	LogAmmo += CurrentAmmoData.Infinite ? "Infinite" : FString::FromInt(CurrentAmmoData.Clips);
-	UE_LOG(LogBaseWeapon, Display, TEXT("%s"), *LogAmmo);
-}
-
 bool ASTUBaseWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
 {
 	FVector ViewLocation;
@@ -114,6 +106,16 @@ bool ASTUBaseWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
 FVector ASTUBaseWeapon::GetMuzzleWorldLocation() const
 {
 	return WeaponMeshComponent->GetSocketLocation(MuzzleSocketName);
+}
+
+FWeaponUIData ASTUBaseWeapon::GetWeaponUIData() const
+{
+	return WeaponUIData;
+}
+
+FAmmoData ASTUBaseWeapon::GetAmmoData() const
+{
+	return CurrentAmmoData;
 }
 
 void ASTUBaseWeapon::StartFire()

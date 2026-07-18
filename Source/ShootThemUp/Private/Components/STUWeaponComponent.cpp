@@ -77,6 +77,28 @@ void USTUWeaponComponent::Reload()
 	ChangeClip();
 }
 
+bool USTUWeaponComponent::GetWeaponUIData(FWeaponUIData& Data) const
+{
+	if (CurrentWeapon)
+	{
+		Data = CurrentWeapon->GetWeaponUIData();
+		return true;
+	}
+
+	return false;
+}
+
+bool USTUWeaponComponent::GetWeaponAmmoData(FAmmoData& Data) const
+{
+	if (CurrentWeapon)
+	{
+		Data = CurrentWeapon->GetAmmoData();
+		return true;
+	}
+
+	return false;
+}
+
 bool USTUWeaponComponent::CanEquip() const
 {
 	return !EquipAnimationInProgress && !ReloadAnimInProgress;

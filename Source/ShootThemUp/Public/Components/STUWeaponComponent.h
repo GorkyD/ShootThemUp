@@ -21,6 +21,9 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
 	void NextWeapon();
 	void Reload();
 
+	bool GetWeaponUIData(FWeaponUIData& Data) const;
+	bool GetWeaponAmmoData(FAmmoData& Data) const;
+
   protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
