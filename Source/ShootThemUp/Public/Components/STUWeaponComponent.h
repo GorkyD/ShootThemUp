@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "STUAmmoPickup.h"
 #include "STUBaseWeapon.h"
 #include "Animation/AnimMontage.h"
 #include "Components/ActorComponent.h"
@@ -23,6 +24,7 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
 
 	bool GetWeaponUIData(FWeaponUIData& Data) const;
 	bool GetWeaponAmmoData(FAmmoData& Data) const;
+	bool TryToAddAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType, int32 ClipsAmount);
 
   protected:
 	virtual void BeginPlay() override;
@@ -45,7 +47,7 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
 
 	void InitAnimations();
 	void SpawnWeapons();
-	void OnEmptyClip();
+	void OnEmptyClip(ASTUBaseWeapon* AmmoEmptyWeapon);
 	void ChangeClip();
 
 	bool CanEquip() const;

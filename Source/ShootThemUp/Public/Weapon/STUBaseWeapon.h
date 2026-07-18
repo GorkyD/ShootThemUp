@@ -24,6 +24,8 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 	FAmmoData GetAmmoData() const;
 
 	void ChangeClip();
+
+	bool TryToAddAmmo(int32 ClipsAmount);
 	bool CanReload() const;
 
   protected:
@@ -56,6 +58,7 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 	bool GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const;
 	bool IsAmmoEmpty() const;
 	bool IsClipEmpty() const;
+	bool IsAmmoFull() const;
 
   private:
 	FAmmoData CurrentAmmoData;

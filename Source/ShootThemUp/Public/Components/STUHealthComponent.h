@@ -14,6 +14,8 @@ UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent)) class SHOOTT
   public:
 	USTUHealthComponent();
 
+	bool TryToAddHealth(float HealthAmount);
+
 	float GetHealth() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
@@ -56,6 +58,8 @@ UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent)) class SHOOTT
 	void HealUpdate();
 
 	void SetHealth(float NewHealthValue);
+
+	bool IsHealthFull() const;
 
 	FTimerHandle HealTimerHandle;
 };
