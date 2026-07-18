@@ -3,7 +3,7 @@
 #include "Weapon/STUBaseWeapon.h"
 #include "DrawDebugHelpers.h"
 #include "TimerManager.h"
-#include "Engine/HitResult.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseWeapon, All, All)
@@ -52,6 +52,11 @@ bool ASTUBaseWeapon::IsClipEmpty() const
 	return CurrentAmmoData.Bullets == 0;
 }
 
+bool ASTUBaseWeapon::IsAmmoFull() const
+{
+	return CurrentAmmoData.Clips == DefaultAmmoData.Clips && CurrentAmmoData.Bullets == DefaultAmmoData.Bullets;
+}
+
 void ASTUBaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd)
 {
 	if (!GetWorld()) return;
@@ -71,7 +76,7 @@ void ASTUBaseWeapon::DecreaseAmmo()
 	if (IsClipEmpty() && !IsAmmoEmpty())
 	{
 		StopFire();
-		OnClipEmpty.Broadcast();
+		OnClipEmpty.Broadcast(this);
 	}
 }
 
@@ -86,6 +91,36 @@ void ASTUBaseWeapon::ChangeClip()
 	CurrentAmmoData.Bullets = DefaultAmmoData.Bullets;
 	UE_LOG(LogBaseWeapon, Display, TEXT("----------Clip Changed----------"));
 }
+
+bool ASTUBaseWeapon::TryToAddAmmo(int32 ClipsAmount)
+{
+	if (CurrentAmmoData.Infinite || IsAmmoFull() || ClipsAmount <= 0) return false;
+
+	if (IsAmmoEmpty())
+	{
+		CurrentAmmoData.Clips = FMath::Clamp(ClipsAmount, 0, DefaultAmmoData.Clips + 1);
+		OnClipEmpty.Broadcast(this);
+	}
+	else if (CurrentAmmoData.Clips < DefaultAmmoData.Clips)
+	{
+		const auto NextClipsAmount = CurrentAmmoData.Clips + ClipsAmount;
+		if (DefaultAmmoData.Clips - NextClipsAmount >= 0)
+		{
+			CurrentAmmoData.Clips = NextClipsAmount;
+		}
+		else
+		{
+			CurrentAmmoData.Clips = DefaultAmmoData.Clips;
+			CurrentAmmoData.Bullets = DefaultAmmoData.Bullets;
+		}
+	}
+	else
+	{
+		CurrentAmmoData.Bullets = DefaultAmmoData.Bullets;
+	}
+	return true;
+}
+
 bool ASTUBaseWeapon::CanReload() const
 {
 	return CurrentAmmoData.Bullets < DefaultAmmoData.Bullets && CurrentAmmoData.Clips > 0;

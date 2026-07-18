@@ -10,7 +10,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float);
 DECLARE_MULTICAST_DELEGATE(FOnDeath);
 
 // Weapon
-DECLARE_MULTICAST_DELEGATE(FOnClipEmptySignature)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnClipEmptySignature, ASTUBaseWeapon* AmmoEmptyWeapon);
 
 USTRUCT(BlueprintType)
 struct FAmmoData
