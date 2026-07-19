@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "STUWeaponComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/HUD.h"
 #include "STUGameHUD.generated.h"
@@ -22,5 +23,9 @@ class SHOOTTHEMUP_API ASTUGameHUD : public AHUD
 	virtual void BeginPlay() override;
 
   private:
-	void DrawCrossHair();
+	void DrawCrossHair(const TSubclassOf<ASTUBaseWeapon>& WeaponType, float Spread);
+	void DrawRiffleScopeCrossHair(FVector2D Center, FLinearColor LineColor, float Spread);
+	void DrawLauncherScopeCrossHair(FVector2D Center, FLinearColor LineColor);
+
+	USTUWeaponComponent* WeaponComponent;
 };

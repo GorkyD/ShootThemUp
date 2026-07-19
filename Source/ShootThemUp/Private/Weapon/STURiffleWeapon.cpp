@@ -7,15 +7,28 @@
 #include "Engine/DamageEvents.h"
 #include "GameFramework/PlayerController.h"
 
+void ASTURiffleWeapon::BeginPlay()
+{
+	Super::BeginPlay();
+	CurrentBulletSpread = BulletSpread;
+}
+
 void ASTURiffleWeapon::StartFire()
 {
 	GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &ASTURiffleWeapon::MakeShot, TimeBetweenShots, true);
 	MakeShot();
+	CurrentBulletSpread = FMath::Clamp(CurrentBulletSpread + 0.5f, BulletSpread, 5.0f);
 }
 
 void ASTURiffleWeapon::StopFire()
 {
 	GetWorldTimerManager().ClearTimer(ShotTimerHandle);
+	CurrentBulletSpread = BulletSpread;
+}
+
+float ASTURiffleWeapon::GetCurrentSpread()
+{
+	return CurrentBulletSpread;
 }
 
 void ASTURiffleWeapon::MakeShot()
@@ -58,11 +71,12 @@ bool ASTURiffleWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) cons
 	if (!GetPlayerViewPoint(ViewLocation, ViewRotation)) return false;
 
 	TraceStart = ViewLocation;
-	const auto HalfRadius = FMath::DegreesToRadians(BulletSpread);
+	const auto HalfRadius = FMath::DegreesToRadians(CurrentBulletSpread);
 	const FVector ShootDirection = FMath::VRandCone(ViewRotation.Vector(), HalfRadius);
 	TraceEnd = TraceStart + ShootDirection * TraceMaxDistance;
 	return true;
 }
+
 void ASTURiffleWeapon::MakeDamage(const FHitResult& HitResult)
 {
 	const auto HitTargetActor = HitResult.GetActor();

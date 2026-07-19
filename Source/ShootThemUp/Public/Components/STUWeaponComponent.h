@@ -17,14 +17,18 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
   public:
 	USTUWeaponComponent();
 
+	TSubclassOf<ASTUBaseWeapon> GetCurrentWeaponType() const;
+
 	void StartFire();
 	void StopFire();
 	void NextWeapon();
 	void Reload();
 
+	float GetCurrentSpread();
+
+	bool TryToAddAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType, int32 ClipsAmount);
 	bool GetWeaponUIData(FWeaponUIData& Data) const;
 	bool GetWeaponAmmoData(FAmmoData& Data) const;
-	bool TryToAddAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType, int32 ClipsAmount);
 
   protected:
 	virtual void BeginPlay() override;

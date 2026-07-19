@@ -15,6 +15,8 @@ class SHOOTTHEMUP_API ASTURiffleWeapon : public ASTUBaseWeapon
 	virtual void StartFire() override;
 	virtual void StopFire() override;
 
+	virtual float GetCurrentSpread() override;
+
   protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
 	float TimeBetweenShots = 0.1f;
@@ -24,6 +26,10 @@ class SHOOTTHEMUP_API ASTURiffleWeapon : public ASTUBaseWeapon
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
 	float RiffleDamage = 10.0f;
+
+	float CurrentBulletSpread = 1.5f;
+
+	virtual void BeginPlay() override;
 
 	virtual void MakeShot() override;
 	virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const override;

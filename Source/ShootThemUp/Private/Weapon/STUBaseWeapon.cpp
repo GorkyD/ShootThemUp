@@ -89,7 +89,6 @@ void ASTUBaseWeapon::ChangeClip()
 	}
 
 	CurrentAmmoData.Bullets = DefaultAmmoData.Bullets;
-	UE_LOG(LogBaseWeapon, Display, TEXT("----------Clip Changed----------"));
 }
 
 bool ASTUBaseWeapon::TryToAddAmmo(int32 ClipsAmount)
@@ -151,6 +150,11 @@ FWeaponUIData ASTUBaseWeapon::GetWeaponUIData() const
 FAmmoData ASTUBaseWeapon::GetAmmoData() const
 {
 	return CurrentAmmoData;
+}
+
+float ASTUBaseWeapon::GetCurrentSpread()
+{
+	return 0.0f;
 }
 
 void ASTUBaseWeapon::StartFire()

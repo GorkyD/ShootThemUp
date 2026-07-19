@@ -17,6 +17,11 @@ USTUWeaponComponent::USTUWeaponComponent()
 	CurrentWeaponIndex = 0;
 }
 
+TSubclassOf<ASTUBaseWeapon> USTUWeaponComponent::GetCurrentWeaponType() const
+{
+	return CurrentWeapon ? CurrentWeapon->GetClass() : nullptr;
+}
+
 void USTUWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -85,6 +90,11 @@ void USTUWeaponComponent::ChangeClip()
 void USTUWeaponComponent::Reload()
 {
 	ChangeClip();
+}
+
+float USTUWeaponComponent::GetCurrentSpread()
+{
+	return CurrentWeapon ? CurrentWeapon->GetCurrentSpread() : 0.0f;
 }
 
 bool USTUWeaponComponent::GetWeaponUIData(FWeaponUIData& Data) const

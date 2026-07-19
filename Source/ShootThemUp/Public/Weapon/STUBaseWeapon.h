@@ -17,6 +17,8 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 
 	FOnClipEmptySignature OnClipEmpty;
 
+	virtual float GetCurrentSpread();
+
 	virtual void StartFire();
 	virtual void StopFire();
 
