@@ -17,9 +17,9 @@ USTUWeaponComponent::USTUWeaponComponent()
 	CurrentWeaponIndex = 0;
 }
 
-TSubclassOf<ASTUBaseWeapon> USTUWeaponComponent::GetCurrentWeaponType() const
+EWeaponType USTUWeaponComponent::GetCurrentWeaponType() const
 {
-	return CurrentWeapon ? CurrentWeapon->GetClass() : nullptr;
+	return CurrentWeapon ? CurrentWeapon->GetWeaponType() : EWeaponType::Default;
 }
 
 void USTUWeaponComponent::BeginPlay()

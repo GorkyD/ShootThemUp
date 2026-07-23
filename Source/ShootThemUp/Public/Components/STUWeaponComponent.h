@@ -17,7 +17,7 @@ class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
   public:
 	USTUWeaponComponent();
 
-	TSubclassOf<ASTUBaseWeapon> GetCurrentWeaponType() const;
+	EWeaponType GetCurrentWeaponType() const;
 
 	void StartFire();
 	void StopFire();

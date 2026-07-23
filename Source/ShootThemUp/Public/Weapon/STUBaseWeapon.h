@@ -7,6 +7,14 @@
 #include "GameFramework/Actor.h"
 #include "STUBaseWeapon.generated.h"
 
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	Default UMETA(DisplayName = "Default"),
+	Riffle UMETA(DisplayName = "Riffle"),
+	Launcher UMETA(DisplayName = "Launcher")
+};
+
 UCLASS()
 class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 {
@@ -24,6 +32,8 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 
 	FWeaponUIData GetWeaponUIData() const;
 	FAmmoData GetAmmoData() const;
+
+	EWeaponType GetWeaponType() const;
 
 	void ChangeClip();
 
@@ -47,6 +57,9 @@ class SHOOTTHEMUP_API ASTUBaseWeapon : public AActor
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
 	float TraceMaxDistance = 1500.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+	EWeaponType WeaponType = EWeaponType::Default;
 
 	virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
 	virtual void MakeShot();

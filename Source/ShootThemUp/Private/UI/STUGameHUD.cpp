@@ -3,7 +3,6 @@
 #include "UI/STUGameHUD.h"
 
 #include "STULauncherWeapon.h"
-#include "STURiffleWeapon.h"
 #include "STUWeaponComponent.h"
 #include "Engine/Canvas.h"
 #include "GameFramework/Pawn.h"
@@ -24,18 +23,26 @@ void ASTUGameHUD::DrawHUD()
 	DrawCrossHair(WeaponComponent->GetCurrentWeaponType(), WeaponComponent->GetCurrentSpread());
 }
 
-void ASTUGameHUD::DrawCrossHair(const TSubclassOf<ASTUBaseWeapon>& WeaponType, float Spread)
+void ASTUGameHUD::DrawCrossHair(EWeaponType WeaponType, float Spread)
 {
 	const FVector2D Center(Canvas->SizeX * 0.5f, Canvas->SizeY * 0.5f);
 	const FLinearColor LineColor = FLinearColor::Green;
 
-	if (WeaponType->IsChildOf(ASTULauncherWeapon::StaticClass()))
+	switch (WeaponType)
+	{
+	case EWeaponType::Launcher:
 	{
 		DrawLauncherScopeCrossHair(Center, LineColor);
+		break;
 	}
-	else if (WeaponType->IsChildOf(ASTURiffleWeapon::StaticClass()))
+	case EWeaponType::Riffle:
 	{
 		DrawRiffleScopeCrossHair(Center, LineColor, Spread);
+		break;
+	}
+	case EWeaponType::Default:
+		DrawRiffleScopeCrossHair(Center, LineColor, Spread);
+		break;
 	}
 }
 

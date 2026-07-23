@@ -23,7 +23,7 @@ class SHOOTTHEMUP_API ASTUGameHUD : public AHUD
 	virtual void BeginPlay() override;
 
   private:
-	void DrawCrossHair(const TSubclassOf<ASTUBaseWeapon>& WeaponType, float Spread);
+	void DrawCrossHair(EWeaponType WeaponType, float Spread);
 	void DrawRiffleScopeCrossHair(FVector2D Center, FLinearColor LineColor, float Spread);
 	void DrawLauncherScopeCrossHair(FVector2D Center, FLinearColor LineColor);
 

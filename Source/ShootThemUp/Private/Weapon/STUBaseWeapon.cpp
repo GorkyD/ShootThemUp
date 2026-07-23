@@ -151,6 +151,10 @@ FAmmoData ASTUBaseWeapon::GetAmmoData() const
 {
 	return CurrentAmmoData;
 }
+EWeaponType ASTUBaseWeapon::GetWeaponType() const
+{
+	return WeaponType;
+}
 
 float ASTUBaseWeapon::GetCurrentSpread()
 {
