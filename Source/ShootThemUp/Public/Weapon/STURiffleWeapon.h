@@ -6,12 +6,16 @@
 #include "Weapon/STUBaseWeapon.h"
 #include "STURiffleWeapon.generated.h"
 
+class USTUWeaponFxComponent;
+
 UCLASS()
 class SHOOTTHEMUP_API ASTURiffleWeapon : public ASTUBaseWeapon
 {
 	GENERATED_BODY()
 
   public:
+	ASTURiffleWeapon();
+
 	virtual void StartFire() override;
 	virtual void StopFire() override;
 
@@ -28,6 +32,9 @@ class SHOOTTHEMUP_API ASTURiffleWeapon : public ASTUBaseWeapon
 	float RiffleDamage = 10.0f;
 
 	float CurrentBulletSpread = 1.5f;
+
+	UPROPERTY(VisibleAnywhere, Category = "VFX")
+	USTUWeaponFxComponent* WeaponFxComponent;
 
 	virtual void BeginPlay() override;
 

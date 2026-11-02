@@ -8,6 +8,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "STUProjectile.generated.h"
 
+class USTUWeaponFxComponent;
+
 UCLASS()
 class SHOOTTHEMUP_API ASTUProjectile : public AActor
 {
@@ -24,6 +26,9 @@ class SHOOTTHEMUP_API ASTUProjectile : public AActor
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	UProjectileMovementComponent* MovementComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "VFX")
+	USTUWeaponFxComponent* WeaponFxComponent;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Weapon")
 	float DamageRadius = 200.0f;

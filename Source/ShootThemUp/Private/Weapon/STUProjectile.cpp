@@ -1,8 +1,8 @@
 // Gorky Deathmatch Game, All Rights Reserved.
 
 #include "Weapon/STUProjectile.h"
-
 #include "DrawDebugHelpers.h"
+#include "STUWeaponFxComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/DamageType.h"
 #include "GameFramework/Pawn.h"
@@ -17,11 +17,14 @@ ASTUProjectile::ASTUProjectile()
 	CollisionComponent->InitSphereRadius(InSphereRadius);
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Block);
+	CollisionComponent->bReturnMaterialOnMove = true;
 	SetRootComponent(CollisionComponent);
 
 	MovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 	MovementComponent->InitialSpeed = 2000.0f;
 	MovementComponent->ProjectileGravityScale = 0.0f;
+
+	WeaponFxComponent = CreateDefaultSubobject<USTUWeaponFxComponent>("WeaponFxComponent");
 }
 void ASTUProjectile::SetShootDirection(const FVector& Direction)
 {
@@ -34,6 +37,7 @@ void ASTUProjectile::BeginPlay()
 
 	check(MovementComponent);
 	check(CollisionComponent);
+	check(WeaponFxComponent);
 
 	MovementComponent->Velocity = ShootDirection * MovementComponent->InitialSpeed;
 	CollisionComponent->IgnoreActorWhenMoving(GetOwner(), true);
@@ -46,7 +50,7 @@ void ASTUProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* 
 	UE_LOG(LogTemp, Error, TEXT("Projectile Hit"));
 	MovementComponent->StopMovementImmediately();
 	UGameplayStatics::ApplyRadialDamage(GetWorld(), DamageAmount, GetActorLocation(), DamageRadius, UDamageType::StaticClass(), {GetOwner()}, this, GetController(), DoFullDamage);
-
+	WeaponFxComponent->PlayImpactFx(Hit);
 	DrawDebugSphere(GetWorld(), GetActorLocation(), DamageRadius, 24, FColor::Red, false, 5.0f);
 	Destroy();
 }

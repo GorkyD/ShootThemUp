@@ -3,13 +3,22 @@
 #include "Weapon/STURiffleWeapon.h"
 #include "Engine/HitResult.h"
 #include "DrawDebugHelpers.h"
+#include "STUWeaponFxComponent.h"
 #include "TimerManager.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/PlayerController.h"
 
+ASTURiffleWeapon::ASTURiffleWeapon()
+{
+	WeaponFxComponent = CreateDefaultSubobject<USTUWeaponFxComponent>("WeaponFxComponent");
+}
+
 void ASTURiffleWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+
+	check(WeaponFxComponent);
+
 	CurrentBulletSpread = BulletSpread;
 }
 
@@ -55,6 +64,7 @@ void ASTURiffleWeapon::MakeShot()
 		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 24, FColor::Red, false, 5);
 
 		MakeDamage(HitResult);
+		WeaponFxComponent->PlayImpactFx(HitResult);
 	}
 	else
 	{
